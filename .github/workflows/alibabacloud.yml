@@ -1,0 +1,122 @@
+# Ē'i ōẏārkaphlō ālibābā klā'uḍa kanṭē'ināra rējisṭri (ACR) ē ēkaṭi natuna kanṭē'ināra imēja tairi karabē ēbaṁ puśa karabē,
+ # ēbaṁ tārapara ēṭikē ālibābā klā'uḍa kanṭē'ināra sārbhisa phara kubāranēṭasa (ACK) ē sthāpana karabē, yakhana"pradhāna" śākhāẏa dhākkā dē'ōẏā habē.
+ #
+ # Ē'i ōẏārkaphlō byabahāra karatē, āpanākē nimnalikhita sēṭa-āpa padakṣēpaguli sampūrṇa karatē habē:
+ #
+ # 1. Āpanāra kanṭē'ināra chabi sanrakṣaṇa karāra jan'ya ēkaṭi ACR saṅgrahasthala tairi karuna.
+ # Āpani āra'ō surakṣā ēbaṁ āra'ō bhāla pārapharamyānsēra jan'ya ACR EE udāharaṇa byabahāra karatē pārēna.
+ # Nirdēśābalīra jan'ya https://Www.Alibabacloud.Com/help/doc-detail/142168.Htm dēkhuna
+ #
+ # 2. Āpanāra kanṭē'inārā'ijaḍa ayāplikēśana cālānōra jan'ya ēkaṭi ACK klāsṭāra tairi karuna.
+ # Āpani āra'ō surakṣā ēbaṁ āra'ō bhāla pārapharamyānsēra jan'ya ACK Pro klāsṭāra byabahāra karatē pārēna.
+ # Nirdēśābalīra jan'ya https://Www.Alibabacloud.Com/help/doc-detail/95108.Htm dēkhuna
+ #
+ # 3. 'ACCESS_KEY_ID' ēbaṁ'ACCESS_KEY_SECRET' nāmēra GitHub ayākaśana sikrēṭasē āpanāra ayāksēsaki jōṛā sanrakṣaṇa karuna.
+ # Gōpanīẏatā sēṭa āpa karāra nirdēśābalīra jan'ya dēkhuna: Https://Developer.Github.Com/actions/managing-workflows/storing-secrets/
+ #
+ # 4. REGION_ID, REGISTRY, NAMESPACE, IMAGE, ACK_CLUSTER_ID, ēbaṁ ACK_DEPLOYMENT_NAME-ēra māna paribartana karuna.
+ #
+
+ Nāma: ACK ē bilḍa ēbaṁ ḍiplōẏa karuna
+
+ cālu:
+   Dhākkā:
+     Śākhā: ["Pradhāna"]
+
+ # ēnabhāẏaranamēnṭa bhēriẏēbala ē'i ōẏārkaphlōtē samasta kāja ēbaṁ padakṣēpēra jan'ya upalabdha.
+ Env:
+   REGION_ID: Cn-hangzhou
+   rējisṭri: Registry.Cn-hangzhou.Aliyuncs.Com
+   NAMESPACE: Nāmasthāna
+   chabi: Rēpō
+   ṭyāga: ${{Github.Sha}}
+   ACK_CLUSTER_ID: Klāsṭāra'ā'iḍi
+   ACK_DEPLOYMENT_NAME: Nginx- sthāpanā
+
+   ACR_EE_REGISTRY: Myregistry.Cn-hangzhou.Cr.Aliyuncs.Com
+   ACR_EE_INSTANCE_ID: InstanceID
+   ACR_EE_NAMESPACE: Nāmasthāna
+   ACR_EE_IMAGE: Rēpō
+   ACR_EE_TAG: ${{Github.Sha}}
+
+ anumati:
+   Biṣaẏabastu: Paṛuna
+
+ kāja:
+   Nirmāṇa:
+     Rāna-ana: Ubunṭu-lēṭēsṭa
+     paribēśa: Utpādana
+
+     padakṣēpa:
+     - Nāma: Cēka'ā'uṭa
+       byabahāra karē: Actions/checkout@v3
+
+     # 1.1 ACR-tē laga'ina karuna
+     - nāma: AccessKey pēẏāra diẏē ACR ē laga'ina karuna
+       byabahāra karē: Aliyun/acr-login@v1
+       saṅgē:
+         Añcala-ā'iḍi: "${{Env.REGION_ID}}"
+         ayāksēsa-kī-ā'iḍi: "${{Secrets.ACCESS_KEY_ID}}"
+         ayāksēsa-kī-sikrēṭa: "${{Secrets.ACCESS_KEY_SECRET}}"
+
+     # 1.2 Ēsi'ārē imēja tairi karuna ēbaṁ puśa karuna
+     - nāma: Chabi tairi karuna ēbaṁ ēsi'āra-ē puśa karuna
+       rāna: |
+         Ḍakāra bilḍa --ṭyāga"$REGISTRY/$NAMESPACE/$IMAGE:$TAG".
+         Ḍakāra puśa"$REGISTRY/$NAMESPACE/$IMAGE:$TAG"
+
+     # 1.3 Ēsi'āra-ē skyāna imēja
+     - nāma: ACR tē chabi skyāna karuna
+       byabahāra karē: Aliyun/acr-scan@v1
+       saṅgē:
+         Añcala-ā'iḍi: "${{Env.REGION_ID}}"
+         ayāksēsa-kī-ā'iḍi: "${{Secrets.ACCESS_KEY_ID}}"
+         ayāksēsa-kī-sikrēṭa: "${{Secrets.ACCESS_KEY_SECRET}}"
+         saṅgrahasthala: "${{Env.NAMESPACE}}/${{env.IMAGE}}"
+         ṭyāga: "${{Env.TAG}}"
+
+     # 2.1 (Aicchika) ACR EE-tē laga'ina karuna
+     - byabahāra karē: Actions/checkout@v3
+     - nāma: AccessKey pēẏāra diẏē ACR EE-tē laga'ina karuna
+       byabahāra karē: Aliyun/acr-login@v1
+       saṅgē:
+         Laga'ina-sārbhāra: "Https://${{Env.ACR_EE_REGISTRY}}"
+         añcala-ā'iḍi: "${{Env.REGION_ID}}"
+         ayāksēsa-kī-ā'iḍi: "${{Secrets.ACCESS_KEY_ID}}"
+         ayāksēsa-kī-sikrēṭa: "${{Secrets.ACCESS_KEY_SECRET}}"
+         inasṭyānsa-ā'iḍi: "${{Env.ACR_EE_INSTANCE_ID}}"
+
+     # 2.2 (Aicchika) ACR EE imēja tairi ēbaṁ puśa karuna
+     - nāma: Chabi tairi karuna ēbaṁ ACR EE ē puśa karuna
+       rāna: |
+         Ḍakāra bilḍa -t"$ACR_EE_REGISTRY/$ACR_EE_NAMESPACE/$ACR_EE_IMAGE:$TAG".
+         Ḍakāra puśa"$ACR_EE_REGISTRY/$ACR_EE_NAMESPACE/$ACR_EE_IMAGE:$TAG"
+     # 2.3 (Aicchika) ACR EE tē chabi skyāna karuna
+     - nāma: ACR EE tē chabi skyāna karuna
+       byabahāra karē: Aliyun/acr-scan@v1
+       saṅgē:
+         Añcala-ā'iḍi: "${{Env.REGION_ID}}"
+         ayāksēsa-kī-ā'iḍi: "${{Secrets.ACCESS_KEY_ID}}"
+         ayāksēsa-kī-sikrēṭa: "${{Secrets.ACCESS_KEY_SECRET}}"
+         inasṭyānsa-ā'iḍi: "${{Env.ACR_EE_INSTANCE_ID}}"
+         saṅgrahasthala: "${{Env.ACR_EE_NAMESPACE}}/${{env.ACR_EE_IMAGE}}"
+         ṭyāga: "${{Env.ACR_EE_TAG}}"
+
+     # 3.1 ACK prasaṅga sēṭa karuna
+     - nāma: K8s prasaṅga sēṭa karuna
+       byabahāra karē: Aliyun/ack-set-context@v1
+       saṅgē:
+         Ayāksēsa-kī-ā'iḍi: "${{Secrets.ACCESS_KEY_ID}}"
+         ayāksēsa-kī-sikrēṭa: "${{Secrets.ACCESS_KEY_SECRET}}"
+         klāsṭāra-ā'iḍi: "${{Env.ACK_CLUSTER_ID}}"
+
+     # 3.2 Chabiṭikē ACK klāsṭārē sthāpana karuna
+     - nāma: Kustomize sēṭa āpa karuna
+       rāna: |-
+         Curl -s"https://Raw.Githubusercontent.Com/kubernetes-sigs/kustomize/master/hack/install_kustomize.Sh" | bash/dev/stdin 3.8.6
+     - Nāma: Sthāpana
+       rāna: |-
+         ./Kāsṭamā'ija sampādanā sēṭa citra nibandhana
+         ./Kāsṭamā'ija bilḍa. | Kubectl praẏōga -f -
+         kubectl rōla'ā'uṭa sthiti sthāpanā/$ACK_DEPLOYMENT_NAME
+         kubectl pariṣēbā pāna -ō praśasta
